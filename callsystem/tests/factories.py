@@ -1,11 +1,3 @@
-"""
-Fábricas e fixtures centralizadas para os testes do app `callsystem`.
-
-Centralizar a criação de dados de teste (padrão Factory) garante:
-- DRY: evita repetição de `Call.objects.create(...)` em cada teste
-- Consistência: dados padronizados e legíveis
-- Flexibilidade: parâmetros sobrescritíveis por teste
-"""
 from callsystem.dto import CallDTO
 from callsystem.models import Call
 

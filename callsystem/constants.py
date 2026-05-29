@@ -2,14 +2,14 @@ from enum import StrEnum
 
 
 class CacheStatus(StrEnum):
-    """Estados possíveis do cache Redis na camada DSM."""
+    """Estados possíveis do cache Redis."""
     HIT = "CACHE_HIT"
     MISS = "CACHE_MISS"
     FALLBACK = "FALLBACK_ATIVO"
 
 
 class CallStatus(StrEnum):
-    """Status válidos para um chamado no banco relacional."""
+    """Status válidos para um chamado."""
     PENDING = "pending"
     RESOLVED = "resolved"
 

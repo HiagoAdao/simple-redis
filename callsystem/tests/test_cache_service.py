@@ -1,9 +1,3 @@
-"""
-Testes unitários do `CacheService`.
-
-Verifica operações de cache (get / set / invalidate) em completo isolamento
-do Redis real, usando mocks. Não toca em banco de dados.
-"""
 import json
 from unittest.mock import MagicMock, patch
 

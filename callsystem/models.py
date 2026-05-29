@@ -4,12 +4,7 @@ from .constants import CallStatus
 
 
 class Call(models.Model):
-    """
-    Modelo representativo de um Chamado no banco de dados relacional (SQLite).
-
-    Serve como camada de persistência lenta (disco) — contrastada com a
-    camada de memória compartilhada distribuída (Redis/DSM).
-    """
+    """Modelo representativo de um Chamado no banco de dados SQLite."""
     title: str = models.CharField(max_length=150, verbose_name="Título")
     description: str = models.TextField(verbose_name="Descrição")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")

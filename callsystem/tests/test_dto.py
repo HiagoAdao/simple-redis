@@ -1,9 +1,3 @@
-"""
-Testes unitários do `CallDTO`.
-
-Verifica serialização, desserialização e encapsulamento do DTO
-sem dependência de banco de dados ou Redis.
-"""
 import json
 
 import pytest

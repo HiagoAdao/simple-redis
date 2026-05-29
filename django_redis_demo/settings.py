@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-# Caminho base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-mestre-jedi-aula-redis-secreta'
@@ -14,7 +13,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'callsystem',  # Nosso app didatico
+    'callsystem',
 ]
 
 MIDDLEWARE = [
@@ -47,7 +46,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_redis_demo.wsgi.application'
 
-# Banco de dados SQL local (Fallback Relacional)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -55,20 +53,14 @@ DATABASES = {
     }
 }
 
-# Internacionalizacao simples
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# Arquivos estaticos
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ==========================================
-# CONFIGURACAO REDIS (CAMADA DSM)
-# ==========================================
-# Se a variavel REDIS_URL estiver definida (ex: do Upstash ou Docker), usa ela.
-# Caso contrario, tenta conectar no localhost:6379 com fallback seguro.
+# Configuração do Redis
 REDIS_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/0')

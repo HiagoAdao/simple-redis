@@ -1,12 +1,3 @@
-"""
-Testes de integração HTTP das views do app `callsystem`.
-
-Valida os fluxos de ponta-a-ponta (requisição → view → serviço → template):
-  - Cache Miss: banco lento → grava Redis
-  - Cache Hit:  leitura instantânea do Redis
-  - Fail-Soft:  Redis indisponível → fallback gracioso para o banco
-  - Clear Cache: expurga chave e redireciona
-"""
 import json
 from unittest.mock import MagicMock, patch
 
@@ -71,10 +62,8 @@ class TestCallListView:
         assert response.context["cache_status"] == CacheStatus.MISS
         assert len(response.context["calls"]) == 2
 
-        # Simula latência do banco lento
         mock_sleep.assert_called_once_with(1.5)
 
-        # Grava no Redis após o miss
         mock_set.assert_called_once()
 
     @patch("callsystem.services.CacheService._build_client", return_value=MagicMock())
@@ -101,7 +90,6 @@ class TestCallListView:
         assert len(response.context["calls"]) == 1
         assert response.context["calls"][0].title == "Chamado Cacheado"
 
-        # Sem atraso artificial — veio do cache
         mock_sleep.assert_not_called()
 
     @patch(
@@ -129,7 +117,6 @@ class TestCallListView:
         assert "Falha de DNS" in response.context["error_message"]
         assert len(response.context["calls"]) == 2
 
-        # Fallback também tem latência de disco simulada
         mock_sleep.assert_called_once_with(1.5)
 
 
@@ -167,5 +154,4 @@ class TestClearCacheView:
 
         response = client.get(url_clear_cache)
 
-        # Mesmo com Redis down, redireciona normalmente
         assert response.status_code == 302
