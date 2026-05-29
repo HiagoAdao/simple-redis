@@ -1,4 +1,4 @@
-# Django + Redis Demo — Cache-Aside (DSM)
+# Django + Redis Demo
 
 Aplicação web simples em **Django** integrada ao **Redis**, demonstrando o padrão **Cache-Aside** sob a perspectiva de **DSM (Distributed Shared Memory)**.
 
