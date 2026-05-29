@@ -23,6 +23,8 @@ python_functions = ["test_*"]
 testpaths = ["callsystem/tests"]
 
 [tool.taskipy.tasks]
+makemigrations = "python manage.py makemigrations"
 migrate = "python manage.py migrate"
 run = "python manage.py runserver"
 test = "pytest"
+test-cov = "pytest --cov=callsystem --cov-report=term-missing -v"
