@@ -20,10 +20,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class CallListResult:
-    """
-    Agrega o resultado completo da listagem de chamados para a view.
-    Evita que a view precise conhecer detalhes da orquestração interna.
-    """
+    """Resultado da listagem de chamados para a view."""
     calls: list[CallDTO] = field(default_factory=list)
     cache_status: CacheStatus = CacheStatus.MISS
     error_message: str | None = None
@@ -31,12 +28,7 @@ class CallListResult:
 
 
 class CacheService:
-    """
-    Encapsula todas as operações com o Redis.
-
-    Responsabilidade única: ler, gravar e invalidar entradas de cache.
-    Não sabe nada sobre chamados — apenas sobre serialização/desserialização.
-    """
+    """Serviço para gerenciamento do cache Redis."""
 
     def __init__(self) -> None:
         self._client: redis.Redis = self._build_client()
@@ -73,12 +65,7 @@ class CacheService:
 
 
 class CallRepository:
-    """
-    Abstrai o acesso ao banco de dados relacional.
-
-    Responsabilidade única: buscar entidades `Call` e converter para DTOs.
-    A ordenação padrão vem da `class Meta` do modelo (ordering = ["-id"]).
-    """
+    """Repositório para acesso aos dados do modelo Call."""
 
     @staticmethod
     def fetch_all() -> list[CallDTO]:
@@ -96,10 +83,7 @@ class CallRepository:
 
     @staticmethod
     def ensure_initial_data() -> None:
-        """
-        Garante a existência de dados iniciais para fins didáticos.
-        Executado apenas quando o banco está completamente vazio.
-        """
+        """Garante a existência de dados iniciais se o banco estiver vazio."""
         if Call.objects.exists():
             return
         Call.objects.bulk_create([
@@ -122,19 +106,7 @@ class CallRepository:
 
 
 class CallListUseCase:
-    """
-    Orquestra a lógica de leitura de chamados com padrão Cache-Aside.
-
-    Implementa o Princípio de Inversão de Dependência (DIP) ao receber
-    `CacheService` e `CallRepository` como dependências injetáveis —
-    o que facilita a substituição por mocks nos testes.
-
-    Fluxo:
-        1. Garante dados iniciais no banco.
-        2. Tenta ler do cache (Redis/DSM).
-        3. Se MISS: lê do banco lento, popula o cache.
-        4. Se ERRO de conexão: fallback gracioso para o banco (Fail-Soft).
-    """
+    """Caso de uso para listagem de chamados com padrão Cache-Aside."""
 
     def __init__(
         self,
@@ -190,10 +162,7 @@ class CallListUseCase:
 
 
 def build_call_list_use_case() -> CallListUseCase:
-    """
-    Factory function que monta o caso de uso com suas dependências reais.
-    Centraliza a injeção de dependências para evitar acoplamento nas views.
-    """
+    """Factory function para instanciar CallListUseCase com dependências."""
     return CallListUseCase(
         cache=CacheService(),
         repository=CallRepository(),

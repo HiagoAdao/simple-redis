@@ -5,12 +5,7 @@ from typing import Any
 
 @dataclass(frozen=True)
 class CallDTO:
-    """
-    DTO imutável que trafega dados de chamados entre camadas.
-
-    Usa `frozen=True` para garantir que o estado não seja alterado
-    após a desserialização do cache — princípio da imutabilidade.
-    """
+    """DTO para transporte dos dados dos chamados."""
     id: int
     title: str
     description: str

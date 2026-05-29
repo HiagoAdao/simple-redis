@@ -10,10 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def call_list(request: HttpRequest) -> HttpResponse:
-    """
-    Lista os chamados aplicando Cache-Aside com tolerância a falhas (Fail-Soft).
-    Delega toda a lógica ao `CallListUseCase`.
-    """
+    """Lista os chamados aplicando o padrão Cache-Aside."""
     result = build_call_list_use_case().execute()
 
     redis_display_url = (
@@ -33,9 +30,7 @@ def call_list(request: HttpRequest) -> HttpResponse:
 
 
 def clear_cache(request: HttpRequest) -> HttpResponse:
-    """
-    Expurga a chave de chamados do Redis para forçar Cache Miss na próxima listagem.
-    """
+    """Limpa a chave de chamados do Redis."""
     try:
         CacheService().invalidate()
     except Exception as exc:
