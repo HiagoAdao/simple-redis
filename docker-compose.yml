@@ -1,0 +1,34 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis-dsm
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - dsm-net
+
+  web:
+    build: .
+    container_name: django-app
+    ports:
+      - "8000:8000"
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    networks:
+      - dsm-net
+    command: >
+      sh -c "uv run python manage.py migrate && uv run python manage.py runserver 0.0.0.0:8000"
+
+networks:
+  dsm-net:
+    driver: bridge
