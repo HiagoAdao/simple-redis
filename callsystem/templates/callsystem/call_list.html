@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Chamados — DSM & Redis Cache</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #334155;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(135deg, #a78bfa, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        /* Painel de Metricas */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .metric-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* Cores Dinamicas para Status e Latencia */
+        .status-HIT { color: var(--success); }
+        .status-MISS { color: var(--warning); }
+        .status-FALLBACK { color: var(--danger); }
+
+        .latency-fast { color: var(--success); }
+        .latency-slow { color: var(--warning); }
+
+        /* Botoes de Acao */
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-muted);
+        }
+
+        /* Alerta de Fallback */
+        .alert {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Tabela de Dados */
+        .table-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-main);
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-pending {
+            background-color: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-resolved {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Painel de Chamados Distribuídos</h1>
+            <p class="subtitle">Demonstração Prática de DSM (Distributed Shared Memory) & Caching com Redis</p>
+        </header>
+
+        {% if error_message %}
+        <div class="alert">
+            <strong>⚠️ Alerta de Conectividade Redis (DSM Inacessível):</strong><br>
+            Não foi possível conectar ao servidor Redis em <code>{{ redis_url }}</code>.<br>
+            O mecanismo de <strong>Fallback Resiliente (Fail-Soft)</strong> foi acionado. A aplicação recuperou as informações diretamente do SQLite, simulando a lentidão típica de disco.
+        </div>
+        {% endif %}
+
+        <!-- Grid de Metricas de Latencia e Estado -->
+        <div class="metrics-grid">
+            <div class="card">
+                <div class="metric-title">⏱️ Latência de Leitura</div>
+                <div class="metric-value {% if cache_status == 'CACHE_HIT' %}latency-fast{% else %}latency-slow{% endif %}">
+                    {{ latency }}s
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="metric-title">💾 Status da Camada DSM</div>
+                <div class="metric-value {% if cache_status == 'CACHE_HIT' %}status-HIT{% elif cache_status == 'CACHE_MISS' %}status-MISS{% else %}status-FALLBACK{% endif %}">
+                    {% if cache_status == "CACHE_HIT" %}
+                        CACHE HIT
+                    {% elif cache_status == "CACHE_MISS" %}
+                        CACHE MISS
+                    {% else %}
+                        FALLBACK ATIVO
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card" style="grid-column: span 1;">
+                <div class="metric-title">🔗 Servidor DSM (Redis)</div>
+                <div class="metric-value" style="font-size: 0.95rem; margin-top: 0.5rem; word-break: break-all; color: var(--text-muted);">
+                    <code>{{ redis_url }}</code>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botoes de Controle -->
+        <div class="actions">
+            <a href="{% url 'callsystem:call_list' %}" class="btn btn-primary">⚡ Atualizar Página (Leitura)</a>
+            <a href="{% url 'callsystem:clear_cache' %}" class="btn btn-secondary">🧹 Limpar Cache no Redis (Forçar Miss)</a>
+        </div>
+
+        <!-- Listagem de Chamados -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th>Título</th>
+                        <th>Descrição</th>
+                        <th style="width: 150px;">Abertura</th>
+                        <th style="width: 120px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for call in calls %}
+                    <tr>
+                        <td><strong>#{{ call.id }}</strong></td>
+                        <td>{{ call.title }}</td>
+                        <td>{{ call.description }}</td>
+                        <td>{{ call.created_at }}</td>
+                        <td>
+                            {% if call.status == "Pendente" %}
+                                <span class="badge badge-pending">Pendente</span>
+                            {% else %}
+                                <span class="badge badge-resolved">Resolvido</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum chamado encontrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
