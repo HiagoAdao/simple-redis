@@ -1,0 +1,12 @@
+{
+    "schema_version": 2,
+    "commit": "5d878e764a9359d3c1cf19c03d2036be4720a47f",
+    "indexed_at": "2026-10-19T06:09:24Z",
+    "project": "simple-redis-feature-django-redis",
+    "nodes": 211,
+    "edges": 667,
+    "original_size": 2883584,
+    "compressed_size": 204241,
+    "compression_level": 9,
+    "reconcile_basis": "git-clean-head"
+}
