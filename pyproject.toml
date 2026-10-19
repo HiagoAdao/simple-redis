@@ -3,8 +3,7 @@ name = "django-redis-demo"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
-    "django>=5.0,<6.0",
-    "redis>=5.0,<6.0",
+    "django>=5.2,<6.0",
 ]
 
 [dependency-groups]
@@ -20,16 +19,19 @@ DJANGO_SETTINGS_MODULE = "django_redis_demo.settings"
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-testpaths = ["callsystem/tests"]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+omit = ["django_redis_demo/wsgi.py"]
 
 [tool.taskipy.tasks]
 makemigrations = "python manage.py makemigrations"
 migrate = "python manage.py migrate"
 run = "python manage.py runserver"
 test = "pytest"
-test-cov = "pytest --cov=callsystem --cov-report=term-missing -v"
-docker-makemigrations = "docker compose run --rm web uv run python manage.py makemigrations"
-docker-migrate = "docker compose run --rm web uv run python manage.py migrate"
-docker-run = "docker compose up"
-docker-test = "docker compose run --rm web uv run pytest"
-docker-test-cov = "docker compose run --rm web uv run pytest --cov=callsystem --cov-report=term-missing -v"
+test-cov = "pytest --cov=django_redis_demo --cov-report=term-missing --cov-fail-under=90 -v"
+docker-makemigrations = "docker compose run --rm web uv run task makemigrations"
+docker-migrate = "docker compose run --rm web uv run task migrate"
+docker-run = "docker compose up --build"
+docker-test = "docker compose run --rm web uv run task test"
+docker-test-cov = "docker compose run --rm web uv run task test-cov"

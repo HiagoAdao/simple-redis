@@ -1,7 +1,5 @@
-from django.shortcuts import redirect
-from django.urls import include, path
+from django.urls import path
 
-urlpatterns = [
-    path("", lambda request: redirect("callsystem:call_list")),
-    path("calls/", include("callsystem.urls", namespace="callsystem")),
-]
+from .views import health
+
+urlpatterns = [path("health/", health, name="health")]

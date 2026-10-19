@@ -1,35 +1,23 @@
 services:
-  redis:
-    image: redis:7-alpine
-    container_name: redis-dsm
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-    networks:
-      - dsm-net
-
   web:
     build: .
-    container_name: django-app
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
-      REDIS_URL: redis://redis:6379/0
-    depends_on:
-      redis:
-        condition: service_healthy
+      DJANGO_DEBUG: "true"
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-local-development-only}
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
     volumes:
       - .:/app
-      - /app/.venv
-    networks:
-      - dsm-net
     command: >
-      sh -c "uv run python manage.py migrate && uv run python manage.py runserver 0.0.0.0:8000"
-
-networks:
-  dsm-net:
-    driver: bridge
+      uv run python manage.py runserver 0.0.0.0:8000
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/health/', timeout=2)"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
