@@ -1,5 +1,25 @@
 # 07 — Fluxo de validação e evidências
 
+## Validação zero — antes dos comandos do projeto
+
+Antes de pedir `uv sync`, testes ou Compose, siga o diagnóstico por SO em
+`04_integracoes_e_operacao.md` e registre qual fluxo o aluno escolheu.
+
+- **Docker:** exija evidência de CLI (`docker --version`), Compose v2
+  (`docker compose version`) e daemon ativo (`docker info`). Python, `uv` e
+  `taskipy` no host não são pré-requisitos desse fluxo; são instalados na imagem.
+- **Local:** exija `uv --version`, sincronize com `uv sync`, confirme a versão
+  selecionada em `uv run python --version` (>=3.12) e rode `uv run task test`
+  para demonstrar que dependências de desenvolvimento, incluindo taskipy,
+  estão disponíveis.
+- Se um executável estiver ausente ou desatualizado, não continue como se o
+  comando tivesse passado. Consulte documentação oficial atual usando Context7,
+  com instruções para o SO/shell/arquitetura do aluno, peça que ele instale e
+  repita a verificação. Não sugira `pip install taskipy`, Python do SO às cegas,
+  comandos de outra plataforma ou instalação automática.
+- Uma versão do Docker CLI não prova que o daemon está ativo; uma instalação de
+  Python no host não prova qual interpretador `uv` usa no projeto.
+
 ## Ordem por missão
 
 1. confirmar objetivo e etapa atual;
@@ -14,14 +34,32 @@
 
 ## Comandos do projeto
 
-### Scaffold
+Execute apenas a coluna do fluxo selecionado. A imagem Docker já inclui Python,
+`uv` e o grupo de desenvolvimento; não exija essas ferramentas no host para
+iniciar o container.
+
+### Scaffold — fluxo local
 
 ```bash
+uv --version
 uv sync
+uv run python --version
 uv run task test
 uv run task test-cov
 uv run python manage.py check
 uv run python manage.py makemigrations --check --dry-run
+```
+
+`uv sync` deve instalar o grupo `dev` do projeto, incluindo `taskipy`. Se o
+comando `task` não for encontrado, confira o diretório e a saída da sincronização;
+não instale taskipy globalmente.
+
+### Scaffold — fluxo Docker
+
+```bash
+docker --version
+docker compose version
+docker info
 docker compose config
 docker compose up --build -d --wait
 docker compose ps
@@ -31,12 +69,19 @@ docker compose run --rm web uv run task test
 
 ### Depois de criar modelo e Redis
 
+**Local:**
+
 ```bash
 uv lock
 uv run task makemigrations
 uv run task migrate
 uv run task test
 uv run task test-cov
+```
+
+**Docker:**
+
+```bash
 docker compose up --build -d --wait
 docker compose logs web redis
 docker compose down

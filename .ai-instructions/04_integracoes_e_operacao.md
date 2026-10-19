@@ -5,6 +5,144 @@ descritas em `03_arquitetura_e_estado_final.md`. A base inicial sobe somente
 Django; adicionar Redis ao Compose é uma missão, não uma funcionalidade já
 disponível.
 
+## Portão zero — diagnosticar e preparar o ambiente
+
+Faça esta verificação antes da Missão 0 e antes de sugerir instalações.
+
+### Perguntas de contexto
+
+Confirme com o aluno:
+
+1. sistema operacional e versão;
+2. shell usado (PowerShell, Terminal macOS, shell Linux ou shell dentro do WSL);
+3. arquitetura quando houver instaladores diferentes (por exemplo, Apple
+   Silicon/Intel ou x86_64/ARM);
+4. fluxo escolhido: executar tudo no Docker ou executar Python/testes no host;
+5. se o Docker Desktop/daemon já está aberto, quando o CLI estiver instalado.
+
+O ambiente do agente não comprova o ambiente do aluno. Nunca solicite a saída de
+`env`, `.env`, `docker login`, tokens ou outras configurações secretas.
+
+### Diagnóstico sem instalação
+
+Peça somente o bloco adequado ao SO e shell. Se um executável não existir, o
+aluno deve informar isso; não tratar a mensagem como falha do projeto.
+
+**macOS (Terminal/zsh):**
+
+```bash
+sw_vers
+uname -m
+command -v uv || true
+command -v python3 || true
+command -v docker || true
+```
+
+Se `docker` existir, pedir também `docker --version`, `docker compose version`
+e `docker info`. Se `uv` existir, pedir `uv --version`. Executar
+`python3 --version` somente se `python3` foi encontrado.
+
+**Linux (shell usado para trabalhar no repositório):**
+
+```bash
+cat /etc/os-release
+uname -m
+command -v uv || true
+command -v python3 || true
+command -v docker || true
+```
+
+Para executáveis encontrados, coletar as mesmas versões acima. `docker info`
+verifica se o daemon responde; `docker --version`, sozinho, só confirma o CLI.
+
+**Windows (PowerShell):**
+
+```powershell
+$PSVersionTable.PSVersion
+Get-ComputerInfo -Property WindowsProductName,WindowsVersion,OsArchitecture
+Get-Command uv,python,py,docker -ErrorAction SilentlyContinue
+```
+
+Se `docker` existir, pedir `docker --version`, `docker compose version` e
+`docker info`. Se `uv` existir, pedir `uv --version`. Para cada interpretador
+encontrado, pedir a versão usando o comando correspondente ao shell.
+Não usar comandos de PowerShell em WSL. Se o aluno trabalha dentro do WSL,
+confirmar a distro/shell e verificar a integração WSL do Docker Desktop quando
+essa for a escolha dele.
+
+### Escolher a instalação pelo fluxo
+
+| Fluxo escolhido | Requisitos no host | O que já vem no projeto/container |
+|---|---|---|
+| Docker | Docker Desktop no macOS/Windows, ou Docker Engine e Compose plugin na distro Linux; daemon ativo. | Python, `uv`, Django e dependências de desenvolvimento são instalados pela imagem deste scaffold. Não exigir Python ou `taskipy` no host. |
+| Local | `uv`; um Python 3.12+ disponível ou Python gerenciado por `uv`. | `uv sync` cria/sincroniza o ambiente do projeto e instala o grupo `dev`, incluindo `taskipy` e ferramentas de teste. |
+
+Se o aluno pretende usar ambos, validar cada fluxo separadamente. Não instalar
+Docker, Python e `uv` por rotina sem confirmar que serão usados.
+
+### Consultar documentação atual antes de orientar instalação
+
+Quando um requisito faltar ou estiver abaixo da versão necessária:
+
+1. use Context7 para resolver o ID da ferramenta/biblioteca antes de consultar
+   documentação;
+2. faça uma consulta específica para instalação/atualização no SO, shell e
+   arquitetura informados;
+3. prefira a documentação oficial indicada abaixo e forneça o link junto dos
+   comandos;
+4. explique o que será alterado, se há elevação de privilégio, reinício do
+   terminal/daemon ou requisito de reinicialização;
+5. deixe o aluno executar e depois valide as versões; não execute instaladores
+   automaticamente nem reaproveite comandos de outro SO.
+
+Referências oficiais a consultar/confirmar no momento da orientação:
+
+- [`uv` — instalação por plataforma](https://docs.astral.sh/uv/getting-started/installation/)
+- [`uv` — instalar e escolher versões de Python](https://docs.astral.sh/uv/guides/install-python/)
+- [Docker Desktop para macOS](https://docs.docker.com/desktop/setup/install/mac-install/)
+- [Docker Desktop para Windows](https://docs.docker.com/desktop/setup/install/windows-install/)
+- [Docker Engine para Linux — escolher a distro](https://docs.docker.com/engine/install/)
+- [Docker Compose plugin para Linux](https://docs.docker.com/compose/install/linux/)
+
+Não copie uma linha de instalação antiga para todos os sistemas. Em Linux,
+primeiro identifique a distribuição e siga sua página oficial. Em macOS,
+confirme Apple Silicon ou Intel para escolher o instalador. No Windows, confirme
+PowerShell versus WSL e o backend/integração disponíveis para aquela instalação.
+
+### Python e `uv`
+
+- A exigência do projeto é Python `>=3.12` (`requires-python` em
+  `pyproject.toml`); não assumir que o `python` do sistema atende.
+- Se já houver Python 3.12+, sincronize o projeto com `uv sync` e confira a
+  versão realmente selecionada dentro do ambiente via `uv run python --version`.
+- Se estiver ausente/desatualizado e `uv` estiver instalado, oriente o aluno a
+  instalar um interpretador gerenciado pela ferramenta (por exemplo,
+  `uv python install 3.12`) em vez de modificar o Python global sem necessidade.
+  Depois rode `uv sync` e valide `uv run python --version`; a versão selecionada
+  precisa satisfazer `>=3.12`.
+- Se `uv` estiver ausente, primeiro consulte a instalação oficial por SO/shell;
+  só depois use comandos `uv`. Em Windows, não misture PowerShell e WSL.
+- `taskipy` já pertence ao grupo `dev` do `pyproject.toml`; não deve ser
+  instalado globalmente nem com `pip`. `uv sync` instala esse grupo neste fluxo.
+  Confirme a disponibilidade executando uma tarefa do projeto, por exemplo
+  `uv run task test`. Se `task` não for encontrado, confira diretório atual,
+  saída de `uv sync`, grupo `dev` e lockfile antes de sugerir qualquer instalação.
+
+### Docker e Compose
+
+- `docker --version` verifica o cliente; `docker compose version` verifica o
+  plugin Compose v2; `docker info` verifica se o daemon está ativo e acessível.
+- Se o cliente existir, mas `docker info` falhar, descubra se Docker Desktop ou
+  o serviço Linux está parado antes de propor reinstalação.
+- No Windows/macOS, use as instruções oficiais de Docker Desktop da plataforma e
+  arquitetura detectadas. No Linux, siga as instruções de Docker Engine e Compose
+  plugin da distro; não presuma `apt`/Ubuntu.
+- Explique que instalação de Docker pode exigir permissões administrativas,
+  backend WSL/virtualização ou iniciar um daemon. Não sugira adicionar o aluno ao
+  grupo `docker` nem usar `sudo` sem explicar as implicações e confirmar o SO.
+- Quando instalado, validar `docker info`, `docker compose version` e
+  `docker compose config` antes de tentar construir a aplicação.
+
 ## Configuração Django
 
 - Projeto: `django_redis_demo`.

@@ -16,6 +16,25 @@
    explicação do aluno.
 8. **Registro:** atualize tarefas e aprendizagem em arquivos diferentes.
 
+## Portão zero — ambiente de trabalho
+
+Antes da Missão 0, descubra o ambiente do aluno conforme
+`04_integracoes_e_operacao.md` e `07_validacao_e_evidencias.md`. Pergunte o SO e
+versão, shell/terminal, arquitetura quando relevante e se ele pretende rodar a
+aplicação no Docker ou localmente. Solicite apenas as saídas de diagnóstico
+necessárias; não peça `env`, `.env`, senhas, tokens ou configurações secretas.
+
+Não confunda as ferramentas do host com as do container. Para o fluxo Docker, o
+host precisa do Docker/Compose e de um daemon ativo; Python, `uv` e `taskipy` são
+fornecidos pela imagem de desenvolvimento. Para o fluxo local, verifique `uv`,
+Python compatível e as dependências do projeto. Não exija que o aluno instale
+ferramentas que não serão usadas no fluxo escolhido.
+
+Se algo faltar ou estiver desatualizado, consulte a documentação oficial atual
+antes de orientar a instalação, escolha instruções para o SO/shell/arquitetura
+confirmados, explique permissões/reinicializações e aguarde a ação do aluno.
+Conclua este portão com versões/saídas observadas e só então comece a Missão 0.
+
 ## Portão de progressão
 
 Uma missão só fica concluída quando há, conforme aplicável:

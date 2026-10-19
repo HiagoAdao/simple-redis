@@ -8,6 +8,10 @@ não como um bloco de instruções para colar e executar em lote.
 **Objetivo:** entender o container web, o roteamento Django e a diferença entre
 health HTTP e dependências de negócio.
 
+**Pré-requisito:** concluir o Portão zero de ambiente: SO/shell identificados e
+Docker validado para fluxo container, ou `uv sync`/Python 3.12+/taskipy validados
+para fluxo local.
+
 **Trabalho:** rodar testes, subir o Compose, consultar `/health/` e localizar o
 caminho URLconf → view → `JsonResponse`.
 

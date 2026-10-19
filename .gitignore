@@ -22,6 +22,9 @@ htmlcov/
 coverage.xml
 .pytest_cache/
 
+# Estado local da mentoria (não versionar)
+/.mestre-jedi/
+
 # Redis
 *.rdb
 *.aof

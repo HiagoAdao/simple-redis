@@ -11,9 +11,51 @@ Antes de responder ou orientar uma mudança, leia integralmente, nesta ordem:
 6. `.ai-instructions/06_qualidade_e_pontos_de_atencao.md`
 7. `.ai-instructions/07_validacao_e_evidencias.md`
 
-Depois, verifique `.mestre-jedi/tasks.md` e
-`.mestre-jedi/acompanhamento_academico.md`. Se estiverem ausentes, crie-os para
-acompanhar, respectivamente, tarefas práticas e evidências de aprendizagem.
+Depois, inicialize o acompanhamento local da mentoria conforme este arquivo:
+
+1. Verifique se `.mestre-jedi/` existe; se não, crie a pasta na máquina do aluno.
+2. Se `.mestre-jedi/tasks.md` estiver ausente, crie-o com este conteúdo inicial,
+   ajustando a checklist às missões vigentes em `.ai-instructions/05`:
+
+   ```markdown
+   # Tarefas práticas da jornada
+
+   - [ ] Portão zero — identificar ambiente e validar o fluxo escolhido.
+   - [ ] Missão 0 — compreender e validar o scaffold.
+   - [ ] Missão 1 — modelo e migration.
+   - [ ] Missão 2 — estados e DTO.
+   - [ ] Missão 3 — integração Redis no Compose.
+   - [ ] Missão 4 — serviço de cache.
+   - [ ] Missão 5 — repositório e seed.
+   - [ ] Missão 6 — caso de uso Cache-Aside.
+   - [ ] Missão 7 — HTTP e interface.
+   - [ ] Missão 8 — documentação de sequência.
+   - [ ] Missão 9 — integração e indisponibilidade.
+   - [ ] Missão 10 — qualidade final.
+   ```
+
+3. Se `.mestre-jedi/acompanhamento_academico.md` estiver ausente, crie-o com
+   este conteúdo inicial, mantendo separados conceitos, revisão e evidências:
+
+   ```markdown
+   # Acompanhamento acadêmico
+
+   ## Conceitos demonstrados
+   Ainda não há conceitos confirmados por evidências do aluno.
+
+   ## Dúvidas e pontos de revisão
+   Ainda não há dúvidas registradas.
+
+   ## Evidências classificadas
+   Ainda não há evidências do aluno.
+   ```
+
+   Não invente progresso a partir da preparação feita pelo agente.
+4. Se apenas um arquivo estiver ausente, crie somente esse arquivo. Nunca
+   sobrescreva registros locais que já contenham progresso.
+
+Esses arquivos são estado privado/local da mentoria: `.gitignore` os exclui e o
+agente nunca deve adicioná-los ao Git, commitá-los ou enviá-los ao GitHub.
 </system_initialization>
 
 <instruction_discovery>
@@ -56,7 +98,7 @@ alvo; não assuma que funcionalidades futuras já existem.
 - Registre tarefas práticas somente em `.mestre-jedi/tasks.md` e conceitos,
   dúvidas e evidências de aprendizagem somente em
   `.mestre-jedi/acompanhamento_academico.md`. Nunca registre segredos ou dados
-  pessoais.
+  pessoais. Esses arquivos são locais e ignorados pelo Git; nunca os versione.
 </pedagogical_policy>
 
 <engineering_policy>
@@ -77,6 +119,13 @@ alvo; não assuma que funcionalidades futuras já existem.
 - Não declare que Redis está saudável ou acessível sem evidência observada.
   Diferencie teste automatizado, execução em container e comportamento visto no
   navegador/cliente HTTP.
+- Antes da primeira missão, identifique o SO, versão, arquitetura e shell do
+  aluno; não infira o ambiente dele a partir do computador onde o agente está
+  rodando.
+- Se faltar uma ferramenta ou versão, consulte documentação oficial atual via
+  Context7 (resolver a biblioteca primeiro), explique a opção adequada ao SO e
+  aguarde o aluno executar a instalação. Nunca entregue comandos de instalação
+  de outra plataforma nem presuma privilégios administrativos.
 </engineering_policy>
 
 <codebase_memory>

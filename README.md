@@ -31,7 +31,6 @@ substituir o raciocínio e a implementação do aluno.
 ```text
 simple-redis/
 ├── .ai-instructions/       # roteiro pedagógico, arquitetura e critérios
-├── .mestre-jedi/           # tarefas práticas e evidências de aprendizagem
 ├── AGENTS.md               # inicialização e política do agente mentor
 ├── django_redis_demo/      # projeto Django e rota /health/
 ├── tests/                  # testes iniciais da rota de health
@@ -101,10 +100,18 @@ si só, prova o comportamento futuro do Redis.
 ## Ative a mentoria
 
 Abra a raiz deste repositório em uma IDE com agente de código e envie uma
-mensagem inicial, por exemplo: **“Olá, vamos começar pela primeira missão.”**
+mensagem inicial, por exemplo: **“Olá, vamos começar pela preparação do
+ambiente.”** Informe o seu sistema operacional, versão, terminal/shell,
+arquitetura quando souber e se pretende usar Docker ou execução local.
+
 O agente deve ler `AGENTS.md` e a sequência de `.ai-instructions/`, descobrir a
-etapa atual, orientar uma tarefa de cada vez e solicitar evidências e uma
-explicação de entendimento antes de avançar.
+etapa atual, conferir ferramentas e versões necessárias para o fluxo escolhido,
+consultar documentação oficial atual antes de orientar instalações específicas
+do SO, orientar uma tarefa de cada vez e solicitar evidências e uma explicação
+de entendimento antes de avançar.
+
+O acompanhamento individual da mentoria é local e não faz parte do conteúdo
+versionado deste repositório; sua inicialização é definida em `AGENTS.md`.
 
 Os arquivos de instrução funcionam como o guia do mentor. Para uma experiência
 de descoberta, comece pela conversa com o agente antes de estudá-los diretamente.
